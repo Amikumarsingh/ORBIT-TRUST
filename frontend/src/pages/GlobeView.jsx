@@ -51,7 +51,7 @@ function makeDebrisSprite() {
   ctx.closePath(); ctx.fill();
   // craters
   ctx.fillStyle='rgba(0,0,0,0.25)';
-  [[2,-1,2.5],[−4,3,1.8],[3,5,1.5]].forEach(([x,y,r])=>{ ctx.beginPath(); ctx.arc(C/2+x,C/2+y,r,0,Math.PI*2); ctx.fill(); });
+  [[2,-1,2.5],[-4,3,1.8],[3,5,1.5]].forEach(([x,y,r])=>{ ctx.beginPath(); ctx.arc(C/2+x,C/2+y,r,0,Math.PI*2); ctx.fill(); });
   return new THREE.CanvasTexture(cv);
 }
 
