@@ -143,25 +143,31 @@ export default function GlobeView() {
       const makeRingTex=(c1,c2)=>{ const W=256,H=32,cv=document.createElement('canvas'); cv.width=W; cv.height=H; const ctx=cv.getContext('2d'); const g=ctx.createLinearGradient(0,0,W,0); g.addColorStop(0,`rgba(${c1},0)`); g.addColorStop(0.15,`rgba(${c1},0.6)`); g.addColorStop(0.45,`rgba(${c2},0.35)`); g.addColorStop(0.7,`rgba(${c1},0.7)`); g.addColorStop(0.9,`rgba(${c1},0.25)`); g.addColorStop(1,`rgba(${c1},0)`); ctx.fillStyle=g; ctx.fillRect(0,0,W,H); return new THREE.CanvasTexture(cv); };
 
       const BG_PLANETS=[
-        {name:'Mercury',r:0.5, dist:60, speed:0.0038,c1:'#b5b5b5',c2:'#888',   bands:false,spots:false},
-        {name:'Venus',  r:0.9, dist:85, speed:0.0015,c1:'#e8c97a',c2:'#c8a050',bands:false,spots:true },
-        {name:'Mars',   r:0.7, dist:120,speed:0.0008,c1:'#c1440e',c2:'#8b2500',bands:false,spots:true },
-        {name:'Jupiter',r:3.8, dist:195,speed:0.00035,c1:'#c88b3a',c2:'#a0522d',bands:true, spots:true, ring:false},
-        {name:'Saturn', r:3.2, dist:265,speed:0.00015,c1:'#e4d191',c2:'#c8a84b',bands:true, spots:false,ring:true, ri:1.45,ro:2.5, rc:'210,180,120','210,180,120':true},
-        {name:'Uranus', r:2.1, dist:335,speed:0.00005,c1:'#7de8e8',c2:'#4fc3c3',bands:false,spots:false,ring:true,ri:1.3,ro:1.75,rc:'100,200,200'},
-        {name:'Neptune',r:2.0, dist:400,speed:0.00002,c1:'#3f54ba',c2:'#1a237e',bands:false,spots:true },
-        {name:'Pluto',  r:0.35,dist:450,speed:0.000010,c1:'#c8a882',c2:'#8b6a4a',bands:false,spots:false},
+        {name:'Mercury',r:0.5, dist:60, speed:0.0038, c1:'#b5b5b5',c2:'#888',   bands:false,spots:false, info:{type:'Terrestrial Planet',diameter:'4,879 km',mass:'3.30×10²³ kg',distSun:'57.9M km',period:'88 days',moons:0,temp:'-180 to 430°C',gravity:'3.7 m/s²',desc:'Smallest planet. No atmosphere. Extreme temperature swings between day and night.'}},
+        {name:'Venus',  r:0.9, dist:85, speed:0.0015, c1:'#e8c97a',c2:'#c8a050',bands:false,spots:true,  info:{type:'Terrestrial Planet',diameter:'12,104 km',mass:'4.87×10²⁴ kg',distSun:'108.2M km',period:'225 days',moons:0,temp:'462°C avg',gravity:'8.87 m/s²',desc:'Hottest planet due to runaway greenhouse effect. Rotates backwards.'}},
+        {name:'Mars',   r:0.7, dist:120,speed:0.0008, c1:'#c1440e',c2:'#8b2500',bands:false,spots:true,  info:{type:'Terrestrial Planet',diameter:'6,779 km',mass:'6.39×10²³ kg',distSun:'227.9M km',period:'687 days',moons:2,temp:'-87 to -5°C',gravity:'3.72 m/s²',desc:'Home of Olympus Mons, tallest volcano in the solar system. Has polar ice caps.'}},
+        {name:'Jupiter',r:3.8, dist:195,speed:0.00035,c1:'#c88b3a',c2:'#a0522d',bands:true, spots:true,  ring:false, info:{type:'Gas Giant',diameter:'139,820 km',mass:'1.90×10²⁷ kg',distSun:'778.5M km',period:'11.9 years',moons:95,temp:'-108°C cloud top',gravity:'24.79 m/s²',desc:'Largest planet. Great Red Spot is a storm raging for 350+ years.'}},
+        {name:'Saturn', r:3.2, dist:265,speed:0.00015,c1:'#e4d191',c2:'#c8a84b',bands:true, spots:false, ring:true,ri:1.45,ro:2.5,rc:'210,180,120', info:{type:'Gas Giant',diameter:'116,460 km',mass:'5.68×10²⁶ kg',distSun:'1.43B km',period:'29.5 years',moons:146,temp:'-138°C avg',gravity:'10.44 m/s²',desc:'Iconic ring system of ice and rock. Least dense planet — would float on water.'}},
+        {name:'Uranus', r:2.1, dist:335,speed:0.00005,c1:'#7de8e8',c2:'#4fc3c3',bands:false,spots:false, ring:true,ri:1.3,ro:1.75,rc:'100,200,200', info:{type:'Ice Giant',diameter:'50,724 km',mass:'8.68×10²⁵ kg',distSun:'2.87B km',period:'84 years',moons:28,temp:'-195°C avg',gravity:'8.69 m/s²',desc:'Rotates on its side with 98° axial tilt. Has faint rings and 28 known moons.'}},
+        {name:'Neptune',r:2.0, dist:400,speed:0.00002,c1:'#3f54ba',c2:'#1a237e',bands:false,spots:true,  info:{type:'Ice Giant',diameter:'49,244 km',mass:'1.02×10²⁶ kg',distSun:'4.50B km',period:'165 years',moons:16,temp:'-200°C avg',gravity:'11.15 m/s²',desc:'Strongest winds in the solar system — up to 2,100 km/h.'}},
+        {name:'Pluto',  r:0.35,dist:450,speed:0.00001,c1:'#c8a882',c2:'#8b6a4a',bands:false,spots:false, info:{type:'Dwarf Planet',diameter:'2,377 km',mass:'1.30×10²² kg',distSun:'5.91B km',period:'248 years',moons:5,temp:'-230°C avg',gravity:'0.62 m/s²',desc:'Reclassified as dwarf planet in 2006. Has a heart-shaped nitrogen ice plain.'}},
       ];
 
       const bgPlanetMeshes=BG_PLANETS.map(p=>{
-        // orbit line
         const op=[]; for(let i=0;i<=96;i++){const a=(i/96)*Math.PI*2; op.push(new THREE.Vector3(Math.cos(a)*p.dist,0,Math.sin(a)*p.dist));} scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(op),new THREE.LineBasicMaterial({color:0x1a2a3a,transparent:true,opacity:0.22})));
         const mesh=new THREE.Mesh(new THREE.SphereGeometry(p.r,24,24),new THREE.MeshPhongMaterial({map:makePTex(p.c1,p.c2,p.bands,p.spots)}));
-        mesh.position.set(p.dist,0,0); scene.add(mesh);
+        mesh.position.set(p.dist,0,0);
+        mesh.userData={ kind:'planet', name:p.name, info:p.info };
+        scene.add(mesh);
+        hoverList.push(mesh);
         if(p.ring){ const ring=new THREE.Mesh(new THREE.RingGeometry(p.r*p.ri,p.r*p.ro,64),new THREE.MeshBasicMaterial({map:makeRingTex(p.rc,p.rc),side:THREE.DoubleSide,transparent:true,opacity:0.85})); ring.rotation.x=p.name==='Uranus'?Math.PI/2:Math.PI/3; mesh.add(ring); }
         if(p.name==='Jupiter'){ const spot=new THREE.Mesh(new THREE.SphereGeometry(0.45,12,12),new THREE.MeshBasicMaterial({color:0xcc3300,transparent:true,opacity:0.65})); spot.position.set(p.r*0.95,-0.4,0); mesh.add(spot); }
         return {...p, mesh, angle:Math.random()*Math.PI*2};
       });
+
+      // Sun hoverable
+      sunMesh.userData={ kind:'sun', name:'The Sun', info:{type:'G-type Main Sequence Star',diameter:'1,392,700 km',mass:'1.99×10³⁰ kg',distSun:'—',period:'—',moons:'8 planets',temp:'5,778 K surface',gravity:'274 m/s²',desc:'Contains 99.86% of solar system mass. Fuses 600M tons of hydrogen per second.'} };
+      hoverList.push(sunMesh);
 
       // ── ASTEROID BELT (between Mars and Jupiter) ───────────────────────────
       const abV=[],abC=[];
@@ -315,6 +321,7 @@ export default function GlobeView() {
       // ── Raycaster ─────────────────────────────────────────────────────────
       const raycaster = new THREE.Raycaster();
       raycaster.params.Sprite = { threshold: 0.18 };
+      raycaster.params.Mesh   = {};
       const mouse = new THREE.Vector2(-9999,-9999);
       const onMouseMove = e => {
         const rect = renderer.domElement.getBoundingClientRect();
@@ -322,7 +329,12 @@ export default function GlobeView() {
         mouse.y = -((e.clientY-rect.top)/rect.height)*2+1;
         raycaster.setFromCamera(mouse, camera);
         const hits = raycaster.intersectObjects(hoverList, false);
-        setTooltip(hits.length>0 ? { ...hits[0].object.userData, mx:e.clientX, my:e.clientY } : null);
+        if(hits.length>0){
+          const ud = hits[0].object.userData;
+          setTooltip({ ...ud, mx:e.clientX, my:e.clientY, _ts: Date.now() });
+        } else {
+          setTooltip(null);
+        }
       };
       renderer.domElement.addEventListener('mousemove', onMouseMove);
 
@@ -378,6 +390,110 @@ export default function GlobeView() {
 
   const zoom = dir => { zoomRef.current=Math.max(6,Math.min(60,zoomRef.current+dir*2.5)); };
 
+  const PLANET_ICONS = { Sun:'☀️', Mercury:'🪨', Venus:'🌫️', Mars:'🔴', Jupiter:'🟠', Saturn:'🪐', Uranus:'🔵', Neptune:'🌊', Pluto:'⚪' };
+
+  const renderTooltip = () => {
+    if(!tooltip) return null;
+    const isPlanet = tooltip.kind==='planet' || tooltip.kind==='sun';
+    const isDebris = tooltip.isDebris;
+    const accentColor = isPlanet
+      ? (tooltip.kind==='sun' ? '#ffcc00' : '#58a6ff')
+      : (isDebris ? '#f85149' : '#3fb950');
+    const borderColor = isPlanet
+      ? (tooltip.kind==='sun' ? 'rgba(255,200,0,0.5)' : 'rgba(88,166,255,0.45)')
+      : (isDebris ? 'rgba(248,81,73,0.45)' : 'rgba(63,185,80,0.45)');
+    const icon = isPlanet
+      ? (PLANET_ICONS[tooltip.name] || '🪐')
+      : (isDebris ? '💥' : '🛰');
+
+    const rows = isPlanet ? [
+      ['Type',          tooltip.info?.type],
+      ['Diameter',      tooltip.info?.diameter],
+      ['Mass',          tooltip.info?.mass],
+      ['Dist from Sun', tooltip.info?.distSun],
+      ['Orbital Period',tooltip.info?.period],
+      ['Moons',         tooltip.info?.moons],
+      ['Temperature',   tooltip.info?.temp],
+      ['Gravity',       tooltip.info?.gravity],
+    ] : [
+      ['NORAD ID',       tooltip.norad_id],
+      ['Altitude',       `${tooltip.alt} km`],
+      ['Velocity',       `${tooltip.vel} km/s`],
+      ['Orbital Period', `${tooltip.period} min`],
+      ['Inclination',    `${tooltip.inc}\u00b0`],
+      ['Eccentricity',   tooltip.ecc],
+      ['Semi-Major Axis',`${tooltip.sma} km`],
+      ['Perigee',        `${tooltip.perigee} km`],
+      ['Apogee',         `${tooltip.apogee} km`],
+      ['Debris Prob',    `${tooltip.debris_prob}%`],
+      ['Confidence',     `${tooltip.confidence}%`],
+    ];
+
+    return (
+      <div key={tooltip._ts} style={{
+        position:'fixed',
+        left:Math.min(tooltip.mx+16, window.innerWidth-275),
+        top: Math.max(tooltip.my-10, 10),
+        width:265,
+        background:'rgba(2,5,9,0.97)',
+        border:`1px solid ${borderColor}`,
+        borderRadius:10, padding:'12px 14px',
+        pointerEvents:'none', zIndex:9999,
+        boxShadow:`0 8px 40px rgba(0,0,0,0.8), 0 0 24px ${borderColor}`,
+        backdropFilter:'blur(10px)',
+        animation:'tooltipFlash 0.35s ease-out',
+      }}>
+        <style>{`
+          @keyframes tooltipFlash {
+            0%   { opacity:0; transform:scale(0.88) translateY(6px); box-shadow:0 0 40px ${borderColor}; }
+            40%  { opacity:1; transform:scale(1.04) translateY(-2px); box-shadow:0 0 60px ${borderColor}; }
+            70%  { transform:scale(0.98); }
+            100% { transform:scale(1) translateY(0); }
+          }
+        `}</style>
+
+        <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10, borderBottom:'1px solid #1e2530', paddingBottom:8 }}>
+          <span style={{ fontSize:'1.4rem' }}>{icon}</span>
+          <div>
+            <div style={{ fontWeight:700, color:'#e6edf3', fontSize:'0.85rem', lineHeight:1.2 }}>{tooltip.name}</div>
+            <div style={{ fontSize:'0.62rem', color:accentColor, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px', marginTop:2 }}>
+              {isPlanet ? tooltip.info?.type : tooltip.type}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 12px', marginBottom: isPlanet ? 10 : 10 }}>
+          {rows.map(([k,v])=>(
+            <div key={k}>
+              <div style={{ fontSize:'0.54rem', color:'#6e7681', textTransform:'uppercase', letterSpacing:0.5 }}>{k}</div>
+              <div style={{ fontSize:'0.74rem', color:'#c9d1d9', fontWeight:600 }}>{v ?? '—'}</div>
+            </div>
+          ))}
+        </div>
+
+        {isPlanet && tooltip.info?.desc && (
+          <div style={{ borderTop:'1px solid #1e2530', paddingTop:8, fontSize:'0.7rem', color:'#8b949e', lineHeight:1.55 }}>
+            {tooltip.info.desc}
+          </div>
+        )}
+
+        {!isPlanet && (
+          <div style={{ borderTop:'1px solid #1e2530', paddingTop:8 }}>
+            <div style={{ fontSize:'0.54rem', color:'#6e7681', textTransform:'uppercase', letterSpacing:0.5, marginBottom:5 }}>Debris Probability</div>
+            <div style={{ background:'#1e2530', borderRadius:4, height:6, overflow:'hidden' }}>
+              <div style={{ height:'100%', borderRadius:4, width:`${tooltip.debris_prob}%`, background:tooltip.debris_prob>70?'#f85149':tooltip.debris_prob>30?'#d29922':'#3fb950', transition:'width 0.3s' }}/>
+            </div>
+            <div style={{ display:'flex', justifyContent:'space-between', marginTop:3 }}>
+              <span style={{ fontSize:'0.54rem', color:'#3fb950' }}>Safe</span>
+              <span style={{ fontSize:'0.54rem', color:'#d29922' }}>Medium</span>
+              <span style={{ fontSize:'0.54rem', color:'#f85149' }}>High Risk</span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div style={{ position:'relative', width:'100%', height:'100%', background:'#020509', overflow:'hidden' }}>
       <div ref={mountRef} style={{ width:'100%', height:'100%', cursor:'grab' }} />
@@ -421,61 +537,7 @@ export default function GlobeView() {
         <span style={{ fontSize:'0.72rem', color:'#6e7681' }}>Drag · Scroll to zoom · Hover to inspect</span>
       </div>
 
-      {tooltip && (
-        <div style={{
-          position:'fixed',
-          left:Math.min(tooltip.mx+16, window.innerWidth-270),
-          top: Math.max(tooltip.my-10, 10),
-          width:258,
-          background:'rgba(2,5,9,0.97)',
-          border:`1px solid ${tooltip.isDebris?'rgba(248,81,73,0.45)':'rgba(63,185,80,0.45)'}`,
-          borderRadius:10, padding:'12px 14px',
-          pointerEvents:'none', zIndex:9999,
-          boxShadow:`0 8px 40px rgba(0,0,0,0.7), 0 0 18px ${tooltip.isDebris?'rgba(248,81,73,0.12)':'rgba(63,185,80,0.12)'}`,
-          backdropFilter:'blur(8px)',
-        }}>
-          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10, borderBottom:'1px solid #1e2530', paddingBottom:8 }}>
-            <span style={{ fontSize:'1.3rem' }}>{tooltip.isDebris?'💥':'🛰'}</span>
-            <div>
-              <div style={{ fontWeight:700, color:'#e6edf3', fontSize:'0.82rem', lineHeight:1.2 }}>{tooltip.name}</div>
-              <div style={{ fontSize:'0.62rem', color:tooltip.isDebris?'#f85149':'#3fb950', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px', marginTop:2 }}>{tooltip.type}</div>
-            </div>
-          </div>
-
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 12px', marginBottom:10 }}>
-            {[
-              ['NORAD ID',      tooltip.norad_id],
-              ['Altitude',      `${tooltip.alt} km`],
-              ['Velocity',      `${tooltip.vel} km/s`],
-              ['Orbital Period',`${tooltip.period} min`],
-              ['Inclination',   `${tooltip.inc}°`],
-              ['Eccentricity',  tooltip.ecc],
-              ['Semi-Major Axis',`${tooltip.sma} km`],
-              ['Perigee',       `${tooltip.perigee} km`],
-              ['Apogee',        `${tooltip.apogee} km`],
-              ['Debris Prob',   `${tooltip.debris_prob}%`],
-              ['Confidence',    `${tooltip.confidence}%`],
-            ].map(([k,v])=>(
-              <div key={k}>
-                <div style={{ fontSize:'0.54rem', color:'#6e7681', textTransform:'uppercase', letterSpacing:0.5 }}>{k}</div>
-                <div style={{ fontSize:'0.74rem', color:'#c9d1d9', fontWeight:600 }}>{v}</div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ borderTop:'1px solid #1e2530', paddingTop:8 }}>
-            <div style={{ fontSize:'0.54rem', color:'#6e7681', textTransform:'uppercase', letterSpacing:0.5, marginBottom:5 }}>Debris Probability</div>
-            <div style={{ background:'#1e2530', borderRadius:4, height:6, overflow:'hidden' }}>
-              <div style={{ height:'100%', borderRadius:4, width:`${tooltip.debris_prob}%`, background:tooltip.debris_prob>70?'#f85149':tooltip.debris_prob>30?'#d29922':'#3fb950', transition:'width 0.3s' }}/>
-            </div>
-            <div style={{ display:'flex', justifyContent:'space-between', marginTop:3 }}>
-              <span style={{ fontSize:'0.54rem', color:'#3fb950' }}>Safe</span>
-              <span style={{ fontSize:'0.54rem', color:'#d29922' }}>Medium</span>
-              <span style={{ fontSize:'0.54rem', color:'#f85149' }}>High Risk</span>
-            </div>
-          </div>
-        </div>
-      )}
+      {renderTooltip()}
     </div>
   );
 }
