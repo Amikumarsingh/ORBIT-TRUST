@@ -1,0 +1,10 @@
+fastapi==0.115.6
+uvicorn==0.32.1
+joblib==1.5.2
+scikit-learn
+imbalanced-learn
+sgp4
+numpy
+pandas
+requests
+python-multipart

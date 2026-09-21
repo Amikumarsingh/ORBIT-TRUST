@@ -1,0 +1,24 @@
+dataset:
+  min_observations: 500
+  min_span_days: 90
+  max_normal_gap_hours: 168
+  valid_sgp4_fraction: 0.99
+
+horizons_hours: [1, 6, 12, 24]
+
+split:
+  train_end: "2022-12-31T23:59:59Z"
+  validation_end: "2023-12-31T23:59:59Z"
+
+coordinates:
+  input_frame: "TEME"
+  analysis_frame: "ECI"
+  error_frame: "RIC"
+
+paths:
+  raw_gp: "data/raw/gp"
+  raw_reference: "data/raw/reference"
+  raw_environment: "data/raw/environment"
+  processed: "data/processed"
+  splits: "data/splits"
+  results: "results"

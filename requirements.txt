@@ -1,0 +1,19 @@
+# Notebook & training dependencies
+pandas
+numpy
+seaborn
+matplotlib
+scipy
+sgp4
+scikit-learn
+imbalanced-learn
+joblib
+
+# Backend API
+fastapi==0.115.6
+uvicorn==0.32.1
+requests
+python-multipart
+
+# Testing
+pytest
